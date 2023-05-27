@@ -71,6 +71,21 @@ def ID3(df):
             tree[best_attr][val] = subtree
 
         return tree
+    
+def predict(observation, tree):
+    for nodes in tree.keys():
+        value = observation[nodes]
+        tree = tree[nodes][value]
+        prediction = 0
+        
+        if type(tree) is dict:
+            prediction = predict(observation, tree)
+        else:
+            prediction = tree
+            break
+            
+    return prediction
+
 
 if __name__ == '__main__':
     df_train = pd.DataFrame({'PesaMucho': [0, 0, 1, 1, 0, 0, 0, 1],
@@ -89,6 +104,10 @@ if __name__ == '__main__':
     print(attribute_entropy(df_train, 'EsSuave'))
     print(best_attribute(df_train))
 
-    features = df_train.columns[:-1].tolist()
+    # features = df_train.columns[:-1].tolist()
     tree = ID3(df_train)
     print(tree)
+    predictions = df_test.apply(predict, axis=1, args=(tree,))
+    print(predictions)
+
+   
