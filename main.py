@@ -56,21 +56,21 @@ def gain(df, attribute):
 #
 #         return tree
 
-def ID3(df, original_df, features):
+def ID3(df):
     unique_vals = np.unique(df['EsVenenosa'])
     if len(unique_vals) == 1:
         return unique_vals[0]
     elif len(df.keys()) <= 1:
-        return
+        return np.argmax(np.unique(df['EsVenenosa'], return_counts=True)[1])
     if len(df.keys()) > 1:
         best_attr = best_attribute(df)[0]
         tree = {best_attr: {}}
         for val in np.unique(df[best_attr]):
-            sub_data = df.where(df[best_attr] == val).dropna()
-            subtree = ID3(sub_data, df.drop([best_attr], axis=1), features)
+            sub_data = df.where(df[best_attr] == val).dropna().drop([best_attr], axis=1)
+            subtree = ID3(sub_data)
             tree[best_attr][val] = subtree
 
-    return tree
+        return tree
 
 if __name__ == '__main__':
     df_train = pd.DataFrame({'PesaMucho': [0, 0, 1, 1, 0, 0, 0, 1],
@@ -90,6 +90,5 @@ if __name__ == '__main__':
     print(best_attribute(df_train))
 
     features = df_train.columns[:-1].tolist()
-    tree = pd.DataFrame()
-    ID3(df_train, df_train, tree)
+    tree = ID3(df_train)
     print(tree)
