@@ -7,12 +7,12 @@ import matplotlib.pyplot as plt
 def obtener_recompensa(estado, laberinto):
     i, j = estado
     if laberinto[i][j] == -1:
-        # return -10
+        # return -10 Valor original
         return -13 # Valor actualizado como medida del apartado 3a) 
     elif laberinto[i][j] == 2:
         return 10
     else:
-        # return 0
+        # return 0 Valor original
         return -1 # Valor actualizado como medida del apartado 3a)
 
 # Función para obtener el estado siguiente dado un estado y una acción
