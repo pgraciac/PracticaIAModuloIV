@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 
 
+# Esta función es para calcular la entropía global
+# recibe una columna y calcula su entropía con la fórmula de la entropía ∑i (- pi (S) · log2 pi (S)).
 def entropy(column):
     vals, cont_vals = np.unique(column, return_counts=True)
     probabilities = cont_vals / len(column)
@@ -9,6 +11,8 @@ def entropy(column):
     return ent
 
 
+# Esta función es para calcular la entropía de un atributo.
+# Lo hace con esta formula EAj = ∑ vi  DOM(Aj) P(vi |S) · EAj_vi.
 def attribute_entropy(df, attribute):
     uniq_vals = df[attribute].unique()
     ent = 0
@@ -19,6 +23,8 @@ def attribute_entropy(df, attribute):
     return ent
 
 
+# Esta función elige el mejor atributo de un dataset
+# Lo hace quedándose con la mejor ganancia posible de entre todos los atributos.
 def best_attribute(df, global_entropy):
     best_gain = 0
     best_attr = ''
@@ -30,16 +36,21 @@ def best_attribute(df, global_entropy):
     return best_attr, best_gain
 
 
+# Esta función calcula la ganancia de un atributo restando la entropía global menos la de ese atributo.
 def gain(df, attribute, global_entropy):
     res = global_entropy - attribute_entropy(df, attribute)
-    #print(global_entropy, "-", attribute_entropy(df, attribute), "=", res)
+    # print(global_entropy, "-", attribute_entropy(df, attribute), "=", res)
     return res
 
+
+# Esta función implementa el algoritmo ID3 usando las anteriores funciones.
+# Es una función recursiva que elige el mejor atributo para realizar el árbol,
+# hasta que todos los valores objetivo son el mismo o hasta que no quedan más atributos.
 def ID3(df, global_entropy):
     unique_vals = np.unique(df[df.columns[-1]])
     if len(unique_vals) == 1:
-        #print("Todos iguales", unique_vals)
-        #print(df)
+        # print("Todos iguales", unique_vals)
+        # print(df)
         return unique_vals[0]
     elif len(df.keys()) <= 1:
         # print("Último atributo")
@@ -58,6 +69,7 @@ def ID3(df, global_entropy):
         return tree
 
 
+# Esta función predice los valores objetivos de un dataset a partir del árbol que crea la anterior función.
 def predict(observation, tree):
     for nodes in tree.keys():
         value = observation[nodes]
@@ -74,7 +86,7 @@ def predict(observation, tree):
 
 
 if __name__ == '__main__':
-    #Ejercicio 1
+    # Ejercicio 1
     df_train = pd.DataFrame({'PesaMucho': [0, 0, 1, 1, 0, 0, 0, 1],
                              'EsMaloliente': [0, 0, 1, 0, 1, 0, 0, 1],
                              'EsConManchas': [0, 1, 0, 0, 1, 1, 0, 0],
