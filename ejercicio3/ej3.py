@@ -1,8 +1,5 @@
 import numpy as np
 
-
-
-
 # Función para obtener la recompensa de un estado
 def obtener_recompensa(estado, laberinto):
     i, j = estado
@@ -25,7 +22,7 @@ def obtener_estado_siguiente(estado, accion, laberinto):
         j -= 1
     elif accion == 3 and j < laberinto.shape[1] - 1:
         j += 1
-    return (i, j)
+    return (i, j) if laberinto[i][j] != -1 else estado
 
 # Función para actualizar la tabla Q
 def actualizar_Q(estado, accion, recompensa, estado_siguiente, laberinto):
@@ -49,6 +46,8 @@ def obtener_camino_optimo(Q, laberinto):
         accion = np.argmax(Q[estado[0]*laberinto.shape[1] + estado[1]]) # Elegimos la acción con el valor Q más alto
         estado = obtener_estado_siguiente(estado, accion, laberinto) # Actualizamos el estado
         camino_optimo.append(estado) # Añadimos el estado al camino óptimo
+        # print("Accion", accion, "Estado", estado)
+        print("Accion", accion, "Estado", estado, "Camino optimo", camino_optimo)
 
     return camino_optimo
 
@@ -80,7 +79,7 @@ if __name__ == '__main__':
     decay_rate = 0.01 # Tasa de decaimiento de epsilon
     # Q-learning
     print("Entrando a q learning")
-    for episodio in range(1000):
+    for episodio in range(2000):
         # print("Episodio", episodio)
         estado = (0, 0)
         while laberinto[estado] != 2 and laberinto[estado] != -1:
@@ -95,5 +94,9 @@ if __name__ == '__main__':
         epsilon = min_epsilon + (1 - min_epsilon)*np.exp(-decay_rate*episodio)
     print("Print tabla Q")
     print(Q)
+    print("Comenzando a obtener camino")
+    print("Acciones: 0=Arriba, 1=Abajo, 2=Izquierda, 3=Derecha")
+    # print(laberinto[0][0])
     camino_optimo = obtener_camino_optimo(Q, laberinto)
+    
     print(camino_optimo)
