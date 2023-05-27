@@ -30,21 +30,20 @@ def obtener_estado_siguiente(estado, accion, laberinto):
     return (i, j) if laberinto[i][j] != -1 else estado
 
 # Función para actualizar la tabla Q
-def actualizar_Q(estado, accion, recompensa, estado_siguiente, laberinto):
+def actualizar_Q(Q, estado, accion, recompensa, estado_siguiente, alpha, gamma, laberinto):
     estado = estado[0]*laberinto.shape[1] + estado[1]
     estado_siguiente = estado_siguiente[0]*laberinto.shape[1] + estado_siguiente[1]
     Q[estado][accion] = Q[estado][accion] + alpha * (recompensa + gamma * np.max(Q[estado_siguiente]) - Q[estado][accion])
 
 # Función para elegir la acción siguiente
-def elegir_accion(estado, epsilon, laberinto):
+def elegir_accion(estado, epsilon, num_acciones, laberinto):
     if np.random.uniform(0, 1) < epsilon:
         return np.random.choice(num_acciones) # Exploración: eligiendo una acción al azar
     else:
         return np.argmax(Q[estado[0]*laberinto.shape[1] + estado[1]]) # Explotación: eligiendo la acción con el valor Q más alto
 
 # Función para obtener el camino óptimo
-def obtener_camino_optimo(Q, laberinto, inicio=(0,0)):
-    estado = inicio 
+def obtener_camino_optimo(Q, laberinto, estado=(0,0)):
     camino_optimo = [estado]
 
     while laberinto[estado] != 2: # Mientras no lleguemos a la casilla de salida
@@ -71,11 +70,9 @@ if __name__ == '__main__':
     num_acciones = 4
     Q = np.zeros((num_estados, num_acciones))
 
-    # Factor de descuento
-    gamma = 0.9
+    gamma = 0.9 # Factor de descuento  
+    alpha = 0.1 # Tasa de aprendizaje
 
-    # Tasa de aprendizaje
-    alpha = 0.1
     # Política epsilon-greedy
     epsilon = 1.0 # Inicializar epsilon a 1. Comenzamos con la exploración
     min_epsilon = 0.01 # Mínimo valor de epsilon
@@ -91,11 +88,11 @@ if __name__ == '__main__':
         salida = False
 
         while laberinto[estado] != 2 and laberinto[estado] != -1:
-            accion = elegir_accion(estado, epsilon, laberinto) # Elegir la acción con el valor Q
+            accion = elegir_accion(estado, epsilon, num_acciones, laberinto) # Elegir la acción con el valor Q
             estado_siguiente = obtener_estado_siguiente(estado, accion, laberinto) # Obtener el estado siguiente
             recompensa = obtener_recompensa(estado_siguiente, laberinto) # Obtener la recompensa
             # print("Episodio",episodio,"Accion:",accion,"Estado actual (casilla)",estado,"Estado siguiente (casilla)", estado_siguiente,"Recompensa del estado siguiente", recompensa)
-            actualizar_Q(estado, accion, recompensa, estado_siguiente, laberinto) # Actualizar la tabla Q
+            actualizar_Q(Q, estado, accion, recompensa, estado_siguiente, alpha, gamma, laberinto) # Actualizar la tabla Q
             estado = estado_siguiente # Actualizar el estado
             recompensa_acumulada += recompensa
             n_pasos += 1
